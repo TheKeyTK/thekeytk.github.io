@@ -1,4 +1,4 @@
-I"|<p>So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device.</p>
+I"!<p>So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).</p>
 
 <p>How does it work you ask? We are going to use a fantastic app, provided by Andrey Egorov(<a href="https://github.com/egorovandreyrm" target="_blank">@egorovandreyrm</a>.), <a href="https://play.google.com/store/apps/details?id=com.egorovandreyrm.pcapremote" target="_blank">pcap remote</a>.
 It works by creating a VPN connection and capturing all the traffic going through that connection and redirecting it to the wireshark where we can analyze it in real-time.</p>
@@ -7,7 +7,7 @@ It works by creating a VPN connection and capturing all the traffic going throug
 Prerequisites:</p>
 <ul>
   <li>android device/emulator</li>
-  <li>apktool</li>
+  <li><a href="https://ibotpeaches.github.io/Apktool/install/" target="_blank">apktool</a></li>
   <li><a href="https://www.wireshark.org/download.html" target="_blank">wireshark</a> (version 3.0+)</li>
   <li><a href="https://play.google.com/store/apps/details?id=com.egorovandreyrm.pcapremote" target="_blank">pcap remote</a></li>
 </ul>
@@ -15,7 +15,7 @@ Prerequisites:</p>
 <p><br />
 Let’s start..</p>
 
-<p>If you are testing on an android version greater than 7.0 you are going to need to tamper with apk a little since google changed network security policy and made it “harder” for us to play. 
+<p>If you are testing on an android version greater than 7.0 you are going to need to tamper with an apk a little, since google changed network security policy and made it “harder” for us to play. 
 Basically what we need to do is to modify the application to accept any self-signed CA so we can intercept and decrypt the traffic.
 For this example, I’m going to use ‘twitter’ android app. Let me show you.</p>
 
@@ -54,15 +54,15 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key.keystore tw
 <h2 id="setup-pcap-remote">Setup pcap remote</h2>
 <p>Now let’s setup pcap remote.</p>
 
-<p>First we are going to install ssl certificate. Tap on 3 dots in top right corner, then settings and then ‘Install’ under ‘SSL Certificate’ category.
-<img src="/assets/pcap-remote-install-cert.png" alt="pcap-remote-install-cert" /></p>
+<p>First we are going to install ssl certificate. Tap on 3 dots in top right corner, then settings and then ‘Install’ under ‘SSL Certificate’ category, follow the installation dialogs and set the device password if prompted.
+<img src="/assets/pcap-remote-install-cert.png" alt="pcap-remote-install-cert" class="center-image" /></p>
 
 <p>Make sure to select ‘SSH Server’ as capturing mode and toggle ‘Make HTTPS/TLS connections decryptable’ .
-<img src="/assets/pcap-setup.png" alt="pcap-setup" /></p>
+<img src="/assets/pcap-setup.png" alt="pcap-setup" class="center-image" /></p>
 
 <p>On the top click on the triangle icon with number one in it and select your target application.
-<img src="/assets/pcap-triangle.png" alt="pcap-setup" />
-<img src="/assets/pcap-chose-app.png" alt="pcap-setup" /></p>
+<img src="/assets/pcap-triangle.png" alt="pcap-setup" class="center-image" />
+<img src="/assets/pcap-chose-app.png" alt="pcap-setup" class="center-image" /></p>
 
 <p><br /></p>
 <h2 id="setup-wireshark">Setup wireshark</h2>
@@ -71,13 +71,19 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key.keystore tw
 <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb forward tcp:15432 tcp:15432
 </code></pre></div></div>
 <p>Open wireshark and select ‘SSH remote capture: sshdump’.
-<img src="/assets/wireshark-sshdump.png" alt="pcap-setup" /></p>
+<img src="/assets/wireshark-sshdump.png" alt="pcap-setup" class="center-image" /></p>
 
-<p>Enter your phone’s IP address (or 127.0.0.1 if you are working on emulator) and port that pcap remote is running on. Also on the ‘Authentication’ tab enter any ssh username and password and click start.
-<img src="/assets/wireshark-ssh-server.png" alt="pcap-setup" />
-<img src="/assets/wireshark-ssh-auth.png" alt="pcap-setup" /></p>
+<p>Enter your phone’s IP address (or 127.0.0.1 if you are working with an emulator) and port that pcap remote is running on. Also on the ‘Authentication’ tab enter any ssh username and password and click start.
+<img src="/assets/wireshark-ssh-server.png" alt="pcap-setup" class="center-image" />
+<img src="/assets/wireshark-ssh-auth.png" alt="pcap-setup" class="center-image" /></p>
 
 <p>Start your application and analyze decrypted traffic in realtime.
-<img src="/assets/wireshark-decrypted-1.png" alt="pcap-setup" />
-<img src="/assets/wireshark-decrypted-2.png" alt="pcap-setup" /></p>
+<img src="/assets/wireshark-decrypted-1.png" alt="pcap-setup" class="center-image" />
+<img src="/assets/wireshark-decrypted-2.png" alt="pcap-setup" class="center-image" /></p>
+
+<p>The end!
+<br /></p>
+
+<p>- ExAndroidDev
+<br /></p>
 :ET

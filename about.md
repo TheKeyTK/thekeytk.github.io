@@ -3,4 +3,12 @@ title: About
 layout: page
 ---
 
-\# TO DO
+Penetration tester with an android development background.  
+Red teaming enthusiasts.  
+<br/>
+Currently focused on AV/EDR avasion and AD pentesting.
+<br/>
+Always discovering new payload delivery techniques.
+
+<br/>
+The end!

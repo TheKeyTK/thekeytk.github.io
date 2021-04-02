@@ -11,4 +11,7 @@ Currently focused on AV/EDR avasion and AD pentesting.
 Always discovering new payload delivery techniques.
 
 <br/>
+Get in touch with me at [@exandroiddev](https://twitter.com/exandroiddev){:target="_blank"}
+
+<br/>
 The end!

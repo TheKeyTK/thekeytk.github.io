@@ -4,7 +4,7 @@
  <title>Ex Android Dev</title>
  <link href="/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2021-04-02T05:08:20-04:00</updated>
+ <updated>2021-04-24T15:41:40+02:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Mark Otto</name>
@@ -13,9 +13,148 @@
 
  
  <entry>
+   <title>Phishing with fake meeting invite</title>
+   <link href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/"/>
+   <updated>2021-04-24T00:00:00+02:00</updated>
+   <id>http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite</id>
+   <content type="html">&lt;p&gt;Have you ever thought about how teams or google meet invites work?&lt;/p&gt;
+
+&lt;p&gt;Recently I was tasked with a social engineering engagement and a random thought crosses my mind, how meeting invites actually work and could I abuse it somehow.&lt;/p&gt;
+
+&lt;p&gt;Of course, it turns out someone already thought of that and this method had been used in the wild, but no one explains how it actually works.
+Since I couldn’t find any blog that technically describes this attack I dig into it myself and in this blog post I will try to explain to you how it works and how you as a pentester/red teamer can include it into your offensive techniques.&lt;/p&gt;
+
+&lt;h3 id=&quot;what-was-my-goal-for-this-phishing-attack&quot;&gt;What was my goal for this phishing attack?&lt;/h3&gt;
+
+&lt;p&gt;Send a fake meeting invite and create a sense of urgency so the target doesn’t pay much attention and click my link which asks for credentials.&lt;/p&gt;
+
+&lt;p&gt;The usual use case for creating a teams meeting (in outlook) works like this:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;click the “New teams meeting” button&lt;/li&gt;
+  &lt;li&gt;new email page opens with an email body pre-populated with teams template and meeting URL&lt;/li&gt;
+  &lt;li&gt;set meeting title and select attendees&lt;/li&gt;
+  &lt;li&gt;click send and magically your attendees receive a fancy looking email where they can accept or deny a meeting invite&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;Creating a meeting in outlook&lt;/em&gt;:
+&lt;img src=&quot;/assets/create_meeting.png&quot; alt=&quot;create_meeting&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Meeting invite arrived in outlook&lt;/em&gt;:
+&lt;img src=&quot;/assets/meeting_invite.png&quot; alt=&quot;meeting_invite&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;so-what-actually-happened-and-why-does-this-invite-look-so-fancy&quot;&gt;So what actually happened and why does this invite look so fancy?&lt;/h3&gt;
+&lt;p&gt;When you create a meeting invite you are simply sending a normal email with the iCalendar object as an attachment.
+Depending on the receiver’s client and how it processes the iCalendar object, you get a fancy-looking email or just a simple email with an attachment.
+In the image below you can see how it looks like when you receive teams meeting invite in protonmail.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/protonmail_receives_outlook_meeting_invite.png&quot; alt=&quot;protonmail_receives_outlook_meeting_invite&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;what-exactly-is-an-icalendar-object&quot;&gt;What exactly is an iCalendar object?&lt;/h3&gt;
+&lt;p&gt;According to  &lt;a href=&quot;https://en.wikipedia.org/wiki/ICalendar&quot; target=&quot;_blank&quot;&gt;wikipedia&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;“The Internet Calendaring and Scheduling Core Object Specification (iCalendar) is a media type which allows users to store and exchange calendaring and scheduling information such as events, to-dos, journal entries, and free/busy information. Files formatted according to the specification usually have an extension of .ics”&lt;/p&gt;
+
+&lt;p&gt;iCalendar is supported by Outlook, Google calendar, Yahoo calendar, Apple calendar, and many more. 
+In this post, I am focusing on outlook.&lt;/p&gt;
+
+&lt;p&gt;Below you can see the iCalendar object of the teams meeting invite. I have simply sent a meeting invite to my protonmail address and just downloaded it and read the attachment.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:GTB Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T040000
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0200
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0300
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER;CN=ExAndroid Developer:mailto:&amp;lt;redacted&amp;gt;@outlook.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=&amp;lt;redacted&amp;gt;@protonmail.com:mailto:&amp;lt;redacted&amp;gt;@protonmail.com
+DESCRIPTION;LANGUAGE=en-US:&amp;lt;stripped&amp;gt;\n\n
+UID:040000008200E00074C5B7101A82E00800000000508CC0468E28D701000000000000000
+ 01000000096DF011F20A29943A70B5DA5047021A5
+SUMMARY;LANGUAGE=en-US:Test meeting
+DTSTART;TZID=GTB Standard Time:20210403T000000
+DTEND;TZID=GTB Standard Time:20210404T000000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20210403T103619Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION;LANGUAGE=en-US:Microsoft Teams Meeting
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-OWNERAPPTID:-570210331
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_YmM1MjRmMTktYjA2N&amp;lt;stripped&amp;gt;cd8%22%7d
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/dc&amp;lt;stripped&amp;gt;DAyMmZj@thread.v2/0
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{&quot;cid&quot;:&quot;19:meeting_YmM1MjRmMTktYjA2Ny00YWQ
+ 4LWI1NWEtZmE1NGVlMDAyMmZj@thread.v2&quot;\,&quot;private&quot;:true\,&quot;type&quot;:0\,&quot;mid&quot;:0\,&quot;
+ rid&quot;:0\,&quot;uid&quot;:null}
+X-MICROSOFT-ONLINEMEETINGCONFLINK:conf:sip:&amp;lt;redacted&amp;gt;\;gruu\;opaque=
+ app:conf:focus:id:teams:2:0!19:meeting_YmM1MjRmMTktYjA2Ny00YWQ4LWI1NWEtZmE
+ 1NGVlMDAyMmZj-thread.v2!56474ffc245241c5ab4081a127cc1cd8!dcf23acb18fc41d28
+ 6acf752f1ca658d
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-LOCATIONS:[ { &quot;DisplayName&quot; : &quot;Microsoft Teams Meeting&quot;\, &quot;Loca
+ tionAnnotation&quot; : &quot;&quot;\, &quot;LocationSource&quot; : 0\, &quot;Unresolved&quot; : false\, &quot;Loca
+ tionUri&quot; : &quot;&quot; } ]
+BEGIN:VALARM
+DESCRIPTION:REMINDER
+TRIGGER;RELATED=START:-PT15M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The basic thing to understand here is that every iCalendar object starts with the &lt;em&gt;“BEGIN:VCALENDAR”&lt;/em&gt; and ends with the &lt;em&gt;“END:VCALENDAR”&lt;/em&gt;.
+The meeting part is between &lt;em&gt;“BEGIN:VEVENT”&lt;/em&gt; and &lt;em&gt;“END:VEVENT”&lt;/em&gt;. Inside your event, you specify so-called components. 
+Usually, not all of the components are required and in my POC you can find a stripped-down ics file that contains only necessary ones. Most of the components are self-explained but I will mark off the most interesting ones.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ORGANIZER&lt;/strong&gt; - specifies meeting organizer name and email address. You can set any email and name here so it looks like the meeting invite is coming from that person.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ATTENDEE&lt;/strong&gt; - specifies meeting attendee. If you need more attendees you would have multiple ATTENDEE components. Keep in mind attendees won’t receive a meeting invite email, this is just for the display. You can easily fake that 30 persons attend the meeting when you actually send an email to a single target.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;X-MICROSOFT-SKYPETEAMSMEETINGURL&lt;/strong&gt; - if you specify this component meeting reminder will have the “Join Online” button displayed. Unfortunately, when clicked, it will try to open a specified URL via desktop teams application and fail.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;DTSTART, DTSTAMP, DTEND&lt;/strong&gt; - specifies the time of the meeting and how long it lasts. I did a neat trick here and set the meeting start time to 5 minutes before the current time, that way it looks like you are late 5 minutes for the meeting. When the target receives an email, outlook processes it as a meeting invite, it seems that the meeting started 5 minutes ago and immediately displays a reminder on the screen. It helps encourage urgency.&lt;/p&gt;
+
+&lt;p&gt;The result looks like this:
+&lt;img src=&quot;/assets/end_result.png&quot; alt=&quot;end_result&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can check out my POC at &lt;a href=&quot;https://github.com/ExAndroidDev/fakemeeting/&quot; target=&quot;_blank&quot;&gt;github&lt;/a&gt; and edit the script and templates to suit your needs.&lt;/p&gt;
+
+&lt;p&gt;Keed in mind I’ve just showed how outlook handles the meeting invites. This should work on any email provider/client that processes ics attachements.&lt;/p&gt;
+
+&lt;p&gt;If you have any questions hit me up on twiter at &lt;a href=&quot;https://twitter.com/ExAndroidDev&quot; target=&quot;_blank&quot;&gt;@ExAndroidDev&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then end!&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>Capture all android network traffic</title>
    <link href="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/"/>
-   <updated>2021-03-21T00:00:00-04:00</updated>
+   <updated>2021-03-21T00:00:00+01:00</updated>
    <id>http://localhost:4000/2021/03/21/capture-all-android-network-traffic</id>
    <content type="html">&lt;p&gt;So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).&lt;/p&gt;
 

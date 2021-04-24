@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark-poole">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>
+     Phishing with fake meeting invite &middot; Ex Android Dev 
+  </title>
+
+  <link rel="stylesheet" href="/styles.css" />
+  <link
+    rel="apple-touch-icon-precomposed"
+    sizes="144x144"
+    href="/assets/apple-touch-icon-precomposed.png"
+  />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link
+    rel="alternate"
+    type="application/atom+xml"
+    title="Ex Android Dev"
+    href="/atom.xml"
+  />
+
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Phishing with fake meeting invite" />
+<meta name="author" content="Mark Otto" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Have you ever thought about how teams or google meet invites work?" />
+<meta property="og:description" content="Have you ever thought about how teams or google meet invites work?" />
+<link rel="canonical" href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/" />
+<meta property="og:url" content="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/" />
+<meta property="og:site_name" content="Ex Android Dev" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-24T00:00:00+02:00" />
+<script type="application/ld+json">
+{"description":"Have you ever thought about how teams or google meet invites work?","@type":"BlogPosting","headline":"Phishing with fake meeting invite","dateModified":"2021-04-24T00:00:00+02:00","url":"http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/","datePublished":"2021-04-24T00:00:00+02:00","author":{"@type":"Person","name":"Mark Otto"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+  <body>
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home">Ex Android Dev</a>
+
+          <nav class="nav">
+            
+            <small><a href="/about">About</a></small>
+            
+          </nav>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Phishing with fake meeting invite</h1>
+  <time datetime="2021-04-24T00:00:00+02:00" class="post-date">24 Apr 2021</time>
+  <p>Have you ever thought about how teams or google meet invites work?</p>
+
+<p>Recently I was tasked with a social engineering engagement and a random thought crosses my mind, how meeting invites actually work and could I abuse it somehow.</p>
+
+<p>Of course, it turns out someone already thought of that and this method had been used in the wild, but no one explains how it actually works.
+Since I couldn’t find any blog that technically describes this attack I dig into it myself and in this blog post I will try to explain to you how it works and how you as a pentester/red teamer can include it into your offensive techniques.</p>
+
+<h3 id="what-was-my-goal-for-this-phishing-attack">What was my goal for this phishing attack?</h3>
+
+<p>Send a fake meeting invite and create a sense of urgency so the target doesn’t pay much attention and click my link which asks for credentials.</p>
+
+<p>The usual use case for creating a teams meeting (in outlook) works like this:</p>
+<ul>
+  <li>click the “New teams meeting” button</li>
+  <li>new email page opens with an email body pre-populated with teams template and meeting URL</li>
+  <li>set meeting title and select attendees</li>
+  <li>click send and magically your attendees receive a fancy looking email where they can accept or deny a meeting invite</li>
+</ul>
+
+<p><em>Creating a meeting in outlook</em>:
+<img src="/assets/create_meeting.png" alt="create_meeting" /></p>
+
+<p><em>Meeting invite arrived in outlook</em>:
+<img src="/assets/meeting_invite.png" alt="meeting_invite" /></p>
+
+<h3 id="so-what-actually-happened-and-why-does-this-invite-look-so-fancy">So what actually happened and why does this invite look so fancy?</h3>
+<p>When you create a meeting invite you are simply sending a normal email with the iCalendar object as an attachment.
+Depending on the receiver’s client and how it processes the iCalendar object, you get a fancy-looking email or just a simple email with an attachment.
+In the image below you can see how it looks like when you receive teams meeting invite in protonmail.</p>
+
+<p><img src="/assets/protonmail_receives_outlook_meeting_invite.png" alt="protonmail_receives_outlook_meeting_invite" /></p>
+
+<h3 id="what-exactly-is-an-icalendar-object">What exactly is an iCalendar object?</h3>
+<p>According to  <a href="https://en.wikipedia.org/wiki/ICalendar" target="_blank">wikipedia</a>:</p>
+
+<p>“The Internet Calendaring and Scheduling Core Object Specification (iCalendar) is a media type which allows users to store and exchange calendaring and scheduling information such as events, to-dos, journal entries, and free/busy information. Files formatted according to the specification usually have an extension of .ics”</p>
+
+<p>iCalendar is supported by Outlook, Google calendar, Yahoo calendar, Apple calendar, and many more. 
+In this post, I am focusing on outlook.</p>
+
+<p>Below you can see the iCalendar object of the teams meeting invite. I have simply sent a meeting invite to my protonmail address and just downloaded it and read the attachment.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:GTB Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T040000
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0200
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0300
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER;CN=ExAndroid Developer:mailto:&lt;redacted&gt;@outlook.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=&lt;redacted&gt;@protonmail.com:mailto:&lt;redacted&gt;@protonmail.com
+DESCRIPTION;LANGUAGE=en-US:&lt;stripped&gt;\n\n
+UID:040000008200E00074C5B7101A82E00800000000508CC0468E28D701000000000000000
+ 01000000096DF011F20A29943A70B5DA5047021A5
+SUMMARY;LANGUAGE=en-US:Test meeting
+DTSTART;TZID=GTB Standard Time:20210403T000000
+DTEND;TZID=GTB Standard Time:20210404T000000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20210403T103619Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION;LANGUAGE=en-US:Microsoft Teams Meeting
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-OWNERAPPTID:-570210331
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_YmM1MjRmMTktYjA2N&lt;stripped&gt;cd8%22%7d
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/dc&lt;stripped&gt;DAyMmZj@thread.v2/0
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_YmM1MjRmMTktYjA2Ny00YWQ
+ 4LWI1NWEtZmE1NGVlMDAyMmZj@thread.v2"\,"private":true\,"type":0\,"mid":0\,"
+ rid":0\,"uid":null}
+X-MICROSOFT-ONLINEMEETINGCONFLINK:conf:sip:&lt;redacted&gt;\;gruu\;opaque=
+ app:conf:focus:id:teams:2:0!19:meeting_YmM1MjRmMTktYjA2Ny00YWQ4LWI1NWEtZmE
+ 1NGVlMDAyMmZj-thread.v2!56474ffc245241c5ab4081a127cc1cd8!dcf23acb18fc41d28
+ 6acf752f1ca658d
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Loca
+ tionUri" : "" } ]
+BEGIN:VALARM
+DESCRIPTION:REMINDER
+TRIGGER;RELATED=START:-PT15M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+</code></pre></div></div>
+
+<p>The basic thing to understand here is that every iCalendar object starts with the <em>“BEGIN:VCALENDAR”</em> and ends with the <em>“END:VCALENDAR”</em>.
+The meeting part is between <em>“BEGIN:VEVENT”</em> and <em>“END:VEVENT”</em>. Inside your event, you specify so-called components. 
+Usually, not all of the components are required and in my POC you can find a stripped-down ics file that contains only necessary ones. Most of the components are self-explained but I will mark off the most interesting ones.</p>
+
+<p><strong>ORGANIZER</strong> - specifies meeting organizer name and email address. You can set any email and name here so it looks like the meeting invite is coming from that person.</p>
+
+<p><strong>ATTENDEE</strong> - specifies meeting attendee. If you need more attendees you would have multiple ATTENDEE components. Keep in mind attendees won’t receive a meeting invite email, this is just for the display. You can easily fake that 30 persons attend the meeting when you actually send an email to a single target.</p>
+
+<p><strong>X-MICROSOFT-SKYPETEAMSMEETINGURL</strong> - if you specify this component meeting reminder will have the “Join Online” button displayed. Unfortunately, when clicked, it will try to open a specified URL via desktop teams application and fail.</p>
+
+<p><strong>DTSTART, DTSTAMP, DTEND</strong> - specifies the time of the meeting and how long it lasts. I did a neat trick here and set the meeting start time to 5 minutes before the current time, that way it looks like you are late 5 minutes for the meeting. When the target receives an email, outlook processes it as a meeting invite, it seems that the meeting started 5 minutes ago and immediately displays a reminder on the screen. It helps encourage urgency.</p>
+
+<p>The result looks like this:
+<img src="/assets/end_result.png" alt="end_result" /></p>
+
+<p>You can check out my POC at <a href="https://github.com/ExAndroidDev/fakemeeting/" target="_blank">github</a> and edit the script and templates to suit your needs.</p>
+
+<p>Keed in mind I’ve just showed how outlook handles the meeting invites. This should work on any email provider/client that processes ics attachements.</p>
+
+<p>If you have any questions hit me up on twiter at <a href="https://twitter.com/ExAndroidDev" target="_blank">@ExAndroidDev</a>.</p>
+
+<p>Then end!</p>
+
+
+  <br/>
+  
+
+<style>
+#share-buttons {display: inline-block; vertical-align: middle; }
+#share-buttons:after {content: ""; display: block; clear: both;}
+#share-buttons > div {
+    position: relative;
+    text-align: left; 
+    height: 36px; 
+    width: 32px; 
+    float: left; 
+    text-align: center;
+}
+#share-buttons > div > svg {height: 16px; fill: #d5d5d5; margin-top: 10px;}
+#share-buttons > div:hover {cursor: pointer;}
+#share-buttons > div.facebook:hover > svg {fill: #3B5998;}
+#share-buttons > div.twitter:hover > svg {fill: #55ACEE;}
+#share-buttons > div.linkedin:hover > svg {fill: #0077b5;}
+#share-buttons > div.pinterest:hover > svg {fill: #CB2027;}
+#share-buttons > div.gplus:hover > svg {fill: #dd4b39;}
+#share-buttons > div.mail:hover > svg {fill: #7D7D7D;}
+#share-buttons > div.instagram:hover > svg {fill: #C73B92;}
+#share-buttons > div.facebook > svg {height: 18px; margin-top: 9px;}
+#share-buttons > div.twitter > svg {height: 20px; margin-top: 8px;}
+#share-buttons > div.linkedin > svg {height: 19px; margin-top: 7px;}
+#share-buttons > div.pinterest > svg {height: 20px; margin-top: 9px;}
+#share-buttons > div.gplus > svg {height: 17px; margin-top: 9px; position: relative; left: 1px;}
+#share-buttons > div.mail > svg {height: 14px; margin-top: 11px;}
+</style>
+
+<div id="share-buttons">
+    <div class="twitter" title="Share this on Twitter" onclick="window.open('http://twitter.com/intent/tweet?text=&url=https://www.exandroid.dev/2021/04/24/phishing-with-fake-meeting-invite/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div>
+    <div class="linkedin" title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://www.exandroid.dev/2021/04/24/phishing-with-fake-meeting-invite/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg></div>
+</div>
+
+</article>
+
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy;
+          <time datetime="2021-04-24T15:41:40+02:00"
+            >2021</time
+          >. All rights reserved.
+        </small>
+      </footer>
+    </div>
+
+    
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        (i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(
+        window,
+        document,
+        "script",
+        "https://www.google-analytics.com/analytics.js",
+        "ga"
+      );
+      ga("create", "UA-193334062-1", "auto");
+      ga("send", "pageview");
+    </script>
+    
+  </body>
+</html>

@@ -10,6 +10,7 @@ plugins:
   - jekyll-paginate
   - jekyll-seo-tag
   - jekyll-admin
+  - jekyll-feed
 
 # Optimize Jekyll
 exclude:
@@ -32,9 +33,8 @@ ga_analytics: UA-193334062-1
 
 # Specify the author for blog posts
 author:
-  name: Mark Otto
-  url: https://twitter.com/mdo
-  email: markdotto@gmail.com
+  name: ExAndroidDev
+  url: https://www.exandroid.dev
 
 # Custom vars
 version: 3.0.0

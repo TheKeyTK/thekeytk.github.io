@@ -1,23 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-
- <title>Ex Android Dev</title>
- <link href="/atom.xml" rel="self"/>
- <link href="http://localhost:4000/"/>
- <updated>2021-05-04T12:12:18+02:00</updated>
- <id>http://localhost:4000</id>
- <author>
-   <name>ExAndroidDev</name>
-   <email></email>
- </author>
-
- 
- <entry>
-   <title>Phishing with fake meeting invite</title>
-   <link href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/"/>
-   <updated>2021-04-24T00:00:00+02:00</updated>
-   <id>http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite</id>
-   <content type="html">&lt;p&gt;Have you ever thought about how teams or google meet invites work?&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-05-04T12:12:18+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Ex Android Dev</title><author><name>ExAndroidDev</name></author><entry><title type="html">Phishing with fake meeting invite</title><link href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/" rel="alternate" type="text/html" title="Phishing with fake meeting invite" /><published>2021-04-24T00:00:00+02:00</published><updated>2021-04-24T00:00:00+02:00</updated><id>http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite</id><content type="html" xml:base="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/">&lt;p&gt;Have you ever thought about how teams or google meet invites work?&lt;/p&gt;
 
 &lt;p&gt;Recently I was tasked with a social engineering engagement and a random thought crosses my mind, how meeting invites actually work and could I abuse it somehow.&lt;/p&gt;
 
@@ -147,16 +128,7 @@ Usually, not all of the components are required and in my POC you can find a str
 
 &lt;p&gt;If you have any questions hit me up on twiter at &lt;a href=&quot;https://twitter.com/ExAndroidDev&quot; target=&quot;_blank&quot;&gt;@ExAndroidDev&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Then end!&lt;/p&gt;
-</content>
- </entry>
- 
- <entry>
-   <title>Capture all android network traffic</title>
-   <link href="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/"/>
-   <updated>2021-03-21T00:00:00+01:00</updated>
-   <id>http://localhost:4000/2021/03/21/capture-all-android-network-traffic</id>
-   <content type="html">&lt;p&gt;So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).&lt;/p&gt;
+&lt;p&gt;Then end!&lt;/p&gt;</content><author><name>ExAndroidDev</name></author><summary type="html">Have you ever thought about how teams or google meet invites work?</summary></entry><entry><title type="html">Capture all android network traffic</title><link href="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/" rel="alternate" type="text/html" title="Capture all android network traffic" /><published>2021-03-21T00:00:00+01:00</published><updated>2021-03-21T00:00:00+01:00</updated><id>http://localhost:4000/2021/03/21/capture-all-android-network-traffic</id><content type="html" xml:base="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/">&lt;p&gt;So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).&lt;/p&gt;
 
 &lt;p&gt;How does it work you ask? We are going to use a fantastic app, provided by Andrey Egorov(&lt;a href=&quot;https://github.com/egorovandreyrm&quot; target=&quot;_blank&quot;&gt;@egorovandreyrm&lt;/a&gt;.), &lt;a href=&quot;https://play.google.com/store/apps/details?id=com.egorovandreyrm.pcapremote&quot; target=&quot;_blank&quot;&gt;pcap remote&lt;/a&gt;.
 It works by creating a VPN connection and capturing all the traffic going through that connection and redirecting it to the wireshark where we can analyze it in real-time.&lt;/p&gt;
@@ -239,9 +211,4 @@ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key.keystore tw
 &lt;img src=&quot;/assets/wireshark-decrypted-1.png&quot; alt=&quot;pcap-setup&quot; class=&quot;center-image&quot; /&gt;
 &lt;img src=&quot;/assets/wireshark-decrypted-2.png&quot; alt=&quot;pcap-setup&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The end!&lt;/p&gt;
-</content>
- </entry>
- 
-
-</feed>
+&lt;p&gt;The end!&lt;/p&gt;</content><author><name>ExAndroidDev</name></author><summary type="html">So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).</summary></entry></feed>

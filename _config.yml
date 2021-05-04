@@ -1,6 +1,8 @@
 # Setup
 title: Ex Android Dev
-url: https://www.exandroid.dev/
+description: cyber security blog posts
+url: https://www.exandroid.dev
+id: https://www.exandroid.dev
 baseurl: ""
 permalink: pretty
 

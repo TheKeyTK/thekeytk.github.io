@@ -3,9 +3,9 @@
 
  <title>Ex Android Dev</title>
  <link href="/atom.xml" rel="self"/>
- <link href="http://localhost:4000/"/>
- <updated>2021-05-04T12:22:10+02:00</updated>
- <id>http://localhost:4000</id>
+ <link href="https://www.exandroid.dev/"/>
+ <updated>2021-05-04T12:30:16+02:00</updated>
+ <id>https://www.exandroid.dev</id>
  <author>
    <name>ExAndroidDev</name>
    <email></email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Phishing with fake meeting invite</title>
-   <link href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/"/>
+   <link href="https://www.exandroid.dev/2021/04/24/phishing-with-fake-meeting-invite/"/>
    <updated>2021-04-24T00:00:00+02:00</updated>
-   <id>http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite</id>
+   <id>https://www.exandroid.dev/2021/04/24/phishing-with-fake-meeting-invite</id>
    <content type="html">&lt;p&gt;Have you ever thought about how teams or google meet invites work?&lt;/p&gt;
 
 &lt;p&gt;Recently I was tasked with a social engineering engagement and a random thought crosses my mind, how meeting invites actually work and could I abuse it somehow.&lt;/p&gt;
@@ -153,9 +153,9 @@ Usually, not all of the components are required and in my POC you can find a str
  
  <entry>
    <title>Capture all android network traffic</title>
-   <link href="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/"/>
+   <link href="https://www.exandroid.dev/2021/03/21/capture-all-android-network-traffic/"/>
    <updated>2021-03-21T00:00:00+01:00</updated>
-   <id>http://localhost:4000/2021/03/21/capture-all-android-network-traffic</id>
+   <id>https://www.exandroid.dev/2021/03/21/capture-all-android-network-traffic</id>
    <content type="html">&lt;p&gt;So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).&lt;/p&gt;
 
 &lt;p&gt;How does it work you ask? We are going to use a fantastic app, provided by Andrey Egorov(&lt;a href=&quot;https://github.com/egorovandreyrm&quot; target=&quot;_blank&quot;&gt;@egorovandreyrm&lt;/a&gt;.), &lt;a href=&quot;https://play.google.com/store/apps/details?id=com.egorovandreyrm.pcapremote&quot; target=&quot;_blank&quot;&gt;pcap remote&lt;/a&gt;.

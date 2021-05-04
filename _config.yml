@@ -1,6 +1,6 @@
 # Setup
 title: Ex Android Dev
-url: https://exandroiddev.github.io/
+url: https://www.exandroid.dev/
 baseurl: ""
 permalink: pretty
 
@@ -35,6 +35,7 @@ ga_analytics: UA-193334062-1
 author:
   name: ExAndroidDev
   url: https://www.exandroid.dev
+  twitter: ExAndroidDev
 
 # Custom vars
 version: 3.0.0

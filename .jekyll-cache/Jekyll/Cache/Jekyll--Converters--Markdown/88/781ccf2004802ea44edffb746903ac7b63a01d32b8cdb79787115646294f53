@@ -1,0 +1,47 @@
+I"<p>I have nothing mind blown to share, so let me tell you a story.</p>
+
+<p>On one of my past pentests, I was engaged to perform an internal penetration test of the network with an assumed breach scenario. I have had access to the machine as a regular employee would.</p>
+
+<p>So, what is the first thing you would do?
+I have tried to run some enumeration scripts, but I haven’t been so careful and antivirus had been triggered. Very soon after, I have been informed by the blue team that my actions have been noticed and they provided me with the picture of antivirus sending them an alert email. That made me wonder, how did the antivirus send the email exactly?</p>
+
+<p>The installed antivirus was ESET. I have started browsing around its options and I have come across email notifications.</p>
+
+<p><img src="/assets/eset-email-notification-settings.png" alt="esset-email-notification-settings" class="center-image" /></p>
+
+<p>Basically, whenever ESET catches something, it sends an email notification.</p>
+
+<p><img src="/assets/eset-email-notification.png" alt="esset-email-notification" class="center-image" /></p>
+
+<p>Depending on the installation and permissions, you might not have an option to edit any settings in the antivirus. That was the case in my scenario, I had read-only permission.</p>
+
+<p>I have tried various ways to read those credentials, among the other things, I have tried the ESET’s export function with the hope to export email credentials in cleartext.</p>
+
+<p><img src="/assets/eset-export-settings.png" alt="eset-export-settings" class="center-image" /></p>
+
+<p>Of course, the password was encrypted.
+<img src="/assets/eset-export-settings-enc-pass.png" alt="eset-export-settings" class="center-image" /></p>
+
+<p>Then it came to my mind, how can ESET send an email if credentials were encrypted? It uses an SMTP, of course it needs cleartext credentials to authenticate to the SMTP server.</p>
+
+<p>So there were 2 possible routes from that point. 
+Find the key and decrypt the credentials or dump the process memory and search for credentials. 
+Guess which one I have chosen. Yes, I have chosen the lazy one.</p>
+
+<p>I have used task manager, found the process and dumped its memory.
+<img src="/assets/task-mgr-2.png" alt="task-mgr-2" class="center-image" />
+<br />
+<img src="/assets/task-mgr-3.png" alt="task-mgr-3" class="center-image" /></p>
+
+<p>A simple search for “SMTP_” through the dump file resulted in the cleartext credentials.</p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>findstr SMTP_ &lt;dump_file&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/findstr-cleartext-password.png" alt="findstr-cleartext-password" class="center-image" /></p>
+
+<p>I wish I could tell you how credentials I have obtained were domain admin’s or how I managed to pwn the whole domain with the help of those credentials, but sadly that was not the case. I could only send an email as that user.</p>
+
+<p>I hope you find this useful and next time check your target’s antivirus configuration.</p>
+
+<p>The end!</p>
+:ET

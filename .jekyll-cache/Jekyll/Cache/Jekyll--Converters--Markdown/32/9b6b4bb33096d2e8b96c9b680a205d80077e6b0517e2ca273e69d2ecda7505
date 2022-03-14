@@ -1,7 +1,0 @@
-I"Ö<p>On one of my past pentests, I was engaged to perform an internal penetration test of the network with an assumed breach scenario. I have had access to the machine as a regular employee would.</p>
-
-<p>So, what is the first thing you would do?
-I have tried to run some enumeration scripts, but I havenâ€™t been so careful and antivirus had been triggered. Very soon after, I have been informed by the blue team that my actions have been noticed and they provided me with the picture of antivirus sending them an alert email. That made me wonder, how did the antivirus send the email exactly?</p>
-
-<p>The installed antivirus was ESET. I have started browsing around its options and I have come across email notifications.</p>
-:ET

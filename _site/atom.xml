@@ -3,9 +3,9 @@
 
  <title>Ex Android Dev</title>
  <link href="/atom.xml" rel="self"/>
- <link href="http://0.0.0.0:4000/"/>
- <updated>2021-11-20T09:55:56+01:00</updated>
- <id>http://0.0.0.0:4000</id>
+ <link href="http://localhost:4000/"/>
+ <updated>2022-03-14T15:28:29+01:00</updated>
+ <id>http://localhost:4000</id>
  <author>
    <name>ExAndroidDev</name>
    <email></email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Pentest tale - Dumping cleartext credentials from antivirus</title>
-   <link href="http://0.0.0.0:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/"/>
+   <link href="http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/"/>
    <updated>2021-11-20T00:00:00+01:00</updated>
-   <id>http://0.0.0.0:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus</id>
+   <id>http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus</id>
    <content type="html">&lt;p&gt;I have nothing “mind blown” to share, so let me tell you a story.&lt;/p&gt;
 
 &lt;p&gt;On one of my past pentests, I was engaged to perform an internal penetration test of the network with an assumed breach scenario. I have had access to the machine as a regular employee would.&lt;/p&gt;
@@ -68,9 +68,9 @@ Guess which one I have chosen. Yes, I have chosen the lazy one.&lt;/p&gt;
  
  <entry>
    <title>AD CS relay attack  - practical guide</title>
-   <link href="http://0.0.0.0:4000/2021/06/23/ad-cs-relay-attack-practical-guide/"/>
+   <link href="http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide/"/>
    <updated>2021-06-23T00:00:00+02:00</updated>
-   <id>http://0.0.0.0:4000/2021/06/23/ad-cs-relay-attack-practical-guide</id>
+   <id>http://localhost:4000/2021/06/23/ad-cs-relay-attack-practical-guide</id>
    <content type="html">&lt;p&gt;Unless you are living under the rock, you have seen that recently &lt;a href=&quot;https://twitter.com/harmj0y&quot; target=&quot;blank&quot;&gt;@harmj0y&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/tifkin_&quot; target=&quot;blank&quot;&gt;@tifkin_&lt;/a&gt;  published their amazing research on Active Directory Certificate Services (AD CS). If you haven’t checked it out already read their &lt;a href=&quot;https://posts.specterops.io/certified-pre-owned-d95910965cd2&quot; target=&quot;blank&quot;&gt;post&lt;/a&gt; first.&lt;/p&gt;
 
 &lt;p&gt;While reading their research, one specific misconfiguration caught my attention, it was “NTLM Relay to AD CS HTTP Endpoints — ESC8”. In their blog post and whitepaper, they explain it in more detail, but basically, this misconfiguration lets the attacker relay user/machine authentication to the AD CS server and obtain a user/machine certificate. Once the attacker obtains the certificate, the attacker can request user/machine TGT and become that user/machine on the network.&lt;/p&gt;
@@ -129,9 +129,9 @@ Run the ntlmrelayx.py and set your Certificate Authority (CA) as a target:&lt;/p
  
  <entry>
    <title>Phishing with fake meeting invite</title>
-   <link href="http://0.0.0.0:4000/2021/04/24/phishing-with-fake-meeting-invite/"/>
+   <link href="http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite/"/>
    <updated>2021-04-24T00:00:00+02:00</updated>
-   <id>http://0.0.0.0:4000/2021/04/24/phishing-with-fake-meeting-invite</id>
+   <id>http://localhost:4000/2021/04/24/phishing-with-fake-meeting-invite</id>
    <content type="html">&lt;p&gt;Have you ever thought about how teams or google meet invites work?&lt;/p&gt;
 
 &lt;p&gt;Recently I was tasked with a social engineering engagement and a random thought crosses my mind, how meeting invites actually work and could I abuse it somehow.&lt;/p&gt;
@@ -268,9 +268,9 @@ Usually, not all of the components are required and in my POC you can find a str
  
  <entry>
    <title>Capture all android network traffic</title>
-   <link href="http://0.0.0.0:4000/2021/03/21/capture-all-android-network-traffic/"/>
+   <link href="http://localhost:4000/2021/03/21/capture-all-android-network-traffic/"/>
    <updated>2021-03-21T00:00:00+01:00</updated>
-   <id>http://0.0.0.0:4000/2021/03/21/capture-all-android-network-traffic</id>
+   <id>http://localhost:4000/2021/03/21/capture-all-android-network-traffic</id>
    <content type="html">&lt;p&gt;So you are performing a pentest on an android app and you have got into a situation where basic certificate pinning bypass doesn’t work. Or you have been dealing with custom protocol instead of good ol’ HTTP. The goal of this post is to teach you how to capture any network traffic on your android device (no root required).&lt;/p&gt;
 
 &lt;p&gt;How does it work you ask? We are going to use a fantastic app, provided by Andrey Egorov(&lt;a href=&quot;https://github.com/egorovandreyrm&quot; target=&quot;_blank&quot;&gt;@egorovandreyrm&lt;/a&gt;.), &lt;a href=&quot;https://play.google.com/store/apps/details?id=com.egorovandreyrm.pcapremote&quot; target=&quot;_blank&quot;&gt;pcap remote&lt;/a&gt;.

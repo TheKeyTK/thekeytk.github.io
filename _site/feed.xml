@@ -1,4 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-14T15:28:29+01:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Ex Android Dev</title><subtitle>cyber security blog posts</subtitle><author><name>ExAndroidDev</name></author><entry><title type="html">Pentest tale - Dumping cleartext credentials from antivirus</title><link href="http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/" rel="alternate" type="text/html" title="Pentest tale - Dumping cleartext credentials from antivirus" /><published>2021-11-20T00:00:00+01:00</published><updated>2021-11-20T00:00:00+01:00</updated><id>http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus</id><content type="html" xml:base="http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/">&lt;p&gt;I have nothing “mind blown” to share, so let me tell you a story.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-21T14:30:34+01:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Ex Android Dev</title><subtitle>cyber security blog posts</subtitle><author><name>ExAndroidDev</name></author><entry><title type="html">Initial Access - Right-To-Left Override [T1036.002]</title><link href="http://localhost:4000/2022/03/21/initial-access-right-to-left-override-t1036002/" rel="alternate" type="text/html" title="Initial Access - Right-To-Left Override [T1036.002]" /><published>2022-03-21T00:00:00+01:00</published><updated>2022-03-21T00:00:00+01:00</updated><id>http://localhost:4000/2022/03/21/initial-access-right-to-left-override-t1036002</id><content type="html" xml:base="http://localhost:4000/2022/03/21/initial-access-right-to-left-override-t1036002/">&lt;p&gt;You have probably heard that Microsoft will soon disable macros in the documents that are coming from the internet (&lt;a href=&quot;https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked&quot; target=&quot;blank&quot;&gt;https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked&lt;/a&gt;). It got me thinking, what are the other alternatives to gain initial access to the target’s environment, what kind of payloads can we deliver?&lt;/p&gt;
+
+&lt;p&gt;While browsing Mitre’s att&amp;amp;ck I have come across a pretty old technique, known as the &lt;a href=&quot;https://attack.mitre.org/techniques/T1036/002/&quot; target=&quot;blank&quot;&gt;right-to-left override attack (rtlo)&lt;/a&gt;. If you have never heard of it, I will try to explain it briefly.
+Some languages write from left to right side, like English and German for example. Some languages write from right to left side, like Arabic and Hebrew for example.
+By default, Windows OS displays letters from left to right side but since it also supports other languages it supports writing from right to left side. There is a unicode character that flips the text to the right-to-left side (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;\u202E&lt;/code&gt;) and you can combine it with the already existing text.
+Basically, you can reverse text in file names and that way hide the true file extension.&lt;/p&gt;
+
+&lt;h5 id=&quot;note-in-my-examples-windows-os-is-set-up-to-show-the-file-extensions-by-default-file-extensions-are-hidden-i-believe-there-is-no-point-in-performing-this-type-of-extension-spoofing-if-the-target-windows-os-is-hiding-file-extensions&quot;&gt;&lt;em&gt;Note: In my examples Windows OS is set up to show the file extensions. By default file extensions are hidden. I believe there is no point in performing this type of extension spoofing if the target Windows OS is hiding file extensions.&lt;/em&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;br /&gt;
+I have written a simple &lt;a href=&quot;https://github.com/ExAndroidDev/rtlo-attack&quot; target=&quot;blank&quot;&gt;tool&lt;/a&gt; in c# that spoofs the extension of a desired executable as well as changes the icon to anything you specify.&lt;/p&gt;
+
+&lt;h3 id=&quot;how-to-use-the-tool&quot;&gt;How to use the tool?&lt;/h3&gt;
+&lt;p&gt;The tool accepts two arguments, the first one is the input executable and the second is the icon. Since I don’t know how to easily explain how to use my tool I will try to explain it through examples.&lt;/p&gt;
+
+&lt;p&gt;Firstly you need to rename your executable to suits the required format before passing it into the tool. 
+	Make sure that the extension you would like to spoof is the last part before the true extension. For example if you want to make a file look like “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.png&lt;/code&gt;” make sure your executable name is something like “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;simple.exemple&lt;/code&gt;&lt;strong&gt;.png.&lt;/strong&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exe&lt;/code&gt;”.
+Also, make sure that the true extension, let’s say it is “.exe” or “.scr”, is present in the filename, whether in its true form or reversed (“&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exe.&lt;/code&gt;” or “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rcs.&lt;/code&gt;”), like “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;simple&lt;/code&gt;&lt;strong&gt;.exe&lt;/strong&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mple.png.exe&lt;/code&gt;”. (More details on reversed extension below.)&lt;/p&gt;
+
+&lt;p&gt;Once you rename your executable to match the required format pass it to the tool as a first argument along with the desired icon. &lt;br /&gt;&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./rtlo-attack.exe simple.exemple.png.exe png.ico
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/example-1.png&quot; alt=&quot;example-1&quot; class=&quot;center-image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The tool works by taking the file extension, like in the previous example “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.exe&lt;/code&gt;” and finding the match inside the executable’s name. After the match is found, it adds rtlo and ltro characters to hide the actual extension and preserve the ordinary-looking name. If you are interested in more details take a look at the &lt;a href=&quot;https://github.com/ExAndroidDev/rtlo-attack/blob/main/Program.cs#L47&quot; target=&quot;blank&quot;&gt;source code&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;additional-obfuscation&quot;&gt;Additional obfuscation&lt;/h3&gt;
+&lt;p&gt;As I mentioned a few paragraphs above, you can also reverse the true file extension to obfuscate it even more. 
+Let’s take a look at the next example. I am going to use the”&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.scr&lt;/code&gt;” extension, since reversing “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.exe&lt;/code&gt;” doesn’t look much different.&lt;/p&gt;
+&lt;h5 id=&quot;note-to-create-an-scr-executable-just-change-the-file-extension-from-exe-to-scr-and-the-executable-will-still-run&quot;&gt;&lt;em&gt;Note: To create an “.scr” executable just change the file extension from “.exe” to “.scr” and the executable will still run.&lt;/em&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;br /&gt;
+So let’s rename an executable to meet filename format requirements before we pass it to the tool. Rename the executable to something like “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;My-pictu&lt;/code&gt;&lt;strong&gt;rcs.&lt;/strong&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;png.scr&lt;/code&gt;” and pass it to the tool. Notice how we specified the true file extension but in reverse (“&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rcs.&lt;/code&gt;”) in the file name. After the tool has done its magic the resulting executable name will look like this “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;My-picturcs.png&lt;/code&gt;”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/example-2.png&quot; alt=&quot;example-2&quot; class=&quot;center-image&quot; /&gt;
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;The other interesting way of obfuscation is changing extension casing. Since Windows OS doesn’t care about the lower or upper case, you can have an extension such as “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.exE&lt;/code&gt;”.
+An example executable can look like this “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;My&lt;/code&gt;&lt;strong&gt;.exE&lt;/strong&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nvironment.png.exE&lt;/code&gt;” and the output would end up looking like this: “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;My.exEnvironment.png&lt;/code&gt;”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/example-3.png&quot; alt=&quot;example-3&quot; class=&quot;center-image&quot; /&gt;
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;name-ideas&quot;&gt;Name ideas:&lt;/h3&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Original name&lt;/th&gt;
+      &lt;th&gt;Spoofed name&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Company.Executive.Summary.txt.Exe&lt;/td&gt;
+      &lt;td&gt;Company.Executive.Summary.txt&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;SOMETHINGEXe.png.eXE&lt;/td&gt;
+      &lt;td&gt;SOMETHINGEXe.png&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;what-about-anti-virus&quot;&gt;What about anti-virus?&lt;/h3&gt;
+&lt;p&gt;You might have noticed that some AVs, like Microsoft’s Defender, for example, flag a file with rtlo character in its name. 
+Fortunately, someone has already researched that part. Thanks to the &lt;a href=&quot;http://blog.sevagas.com/?Bypass-Defender-and-other-thoughts-on-Unicode-RTLO-attacks&quot; target=&quot;blank&quot;&gt;http://blog.sevagas.com/?Bypass-Defender-and-other-thoughts-on-Unicode-RTLO-attacks&lt;/a&gt;, he concluded that AV might flag the file if it contains a rtlo character and ends with a valid extension. I will summarize it below but I encourage you to read the article.&lt;/p&gt;
+
+&lt;p&gt;For example, if you spoof the file name to look like “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;smth.executive.summary.txt&lt;/code&gt;” it will be flagged by AV, but if the name is “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;smth.executive.summary.blah&lt;/code&gt;” it will not.
+If only there is a way to make an extension look legit but is not actually valid…&lt;/p&gt;
+
+&lt;p&gt;Of course there is a way. Since we are already playing with different languages why wouldn’t we use letters from different alphabets.&lt;br /&gt; For example payload “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;smth.executive.summary.txt&lt;/code&gt;” is flagged by the AV, but “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;smth.executive.summary.tхt&lt;/code&gt;” is not since the “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x&lt;/code&gt;” (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;\u0445&lt;/code&gt;) is not an actual Latin letter “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;x&lt;/code&gt;” (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;\u0078&lt;/code&gt;) but an Cyrillic version of letter “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;h&lt;/code&gt;”.  Simply copy/paste the unicode character from any unicode table website and paste it into the file name and it will do the trick.&lt;/p&gt;
+
+&lt;h5 id=&quot;note-there-are-a-variety-of-executable-file-extensions-but-keep-in-mind-that-not-all-of-them-can-have-a-custom-icon-for-example-you-cant-change-the-icon-of-the-bat-or-com-file-types&quot;&gt;&lt;em&gt;Note: There are a variety of executable file extensions, but keep in mind that not all of them can have a custom icon. For example, you can’t change the icon of the “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.bat&lt;/code&gt;” or “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.com&lt;/code&gt;” file types.&lt;/em&gt;&lt;/h5&gt;
+
+&lt;h3 id=&quot;but-how-do-we-deliver-it&quot;&gt;But how do we deliver it?&lt;/h3&gt;
+&lt;p&gt;One option would be to make your target download ZIP archive or ISO/VHD image. ISO image is automatically mounted to the Windows OS by simply double-clicking it and since it is a different system file format it would bypass the so-called mark-of-the-web (MOTW). But that is the content for the other post.&lt;/p&gt;
+
+&lt;p&gt;The end!&lt;/p&gt;</content><author><name>ExAndroidDev</name></author><summary type="html">You have probably heard that Microsoft will soon disable macros in the documents that are coming from the internet (https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked). It got me thinking, what are the other alternatives to gain initial access to the target’s environment, what kind of payloads can we deliver?</summary></entry><entry><title type="html">Pentest tale - Dumping cleartext credentials from antivirus</title><link href="http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/" rel="alternate" type="text/html" title="Pentest tale - Dumping cleartext credentials from antivirus" /><published>2021-11-20T00:00:00+01:00</published><updated>2021-11-20T00:00:00+01:00</updated><id>http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus</id><content type="html" xml:base="http://localhost:4000/2021/11/20/pentest-tale-dumping-cleartext-credentials-from-antivirus/">&lt;p&gt;I have nothing “mind blown” to share, so let me tell you a story.&lt;/p&gt;
 
 &lt;p&gt;On one of my past pentests, I was engaged to perform an internal penetration test of the network with an assumed breach scenario. I have had access to the machine as a regular employee would.&lt;/p&gt;
 

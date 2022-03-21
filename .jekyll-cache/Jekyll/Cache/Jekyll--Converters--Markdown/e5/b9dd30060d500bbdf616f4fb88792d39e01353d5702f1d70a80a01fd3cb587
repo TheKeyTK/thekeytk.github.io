@@ -1,0 +1,81 @@
+I"�%<p>You have probably heard that Microsoft will soon disable macros in the documents that are coming from the internet (<a href="https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked" target="blank">https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked</a>). It got me thinking, what are the other alternatives to gain initial access to the target’s environment, what kind of payloads can we deliver?</p>
+
+<p>While browsing Mitre’s att&amp;ck I have come across a pretty old technique, known as the <a href="https://attack.mitre.org/techniques/T1036/002/" target="blank">right-to-left override attack (rtlo)</a>. If you have never heard of it, I will try to explain it briefly.
+Some languages write from left to right side, like English and German for example. Some languages write from right to left side, like Arabic and Hebrew for example.
+By default, Windows OS displays letters from left to right side but since it also supports other languages it supports writing from right to left side. There is a unicode character that flips the text to the right-to-left side (<code class="language-plaintext highlighter-rouge">\u202E</code>) and you can combine it with the already existing text.
+Basically, you can reverse text in file names and that way hide the true file extension.</p>
+
+<h5 id="note-in-my-examples-windows-os-is-set-up-to-show-the-file-extensions-by-default-file-extensions-are-hidden-i-believe-there-is-no-point-in-performing-this-type-of-extension-spoofing-if-the-target-windows-os-is-hiding-file-extensions"><em>Note: In my examples Windows OS is set up to show the file extensions. By default file extensions are hidden. I believe there is no point in performing this type of extension spoofing if the target Windows OS is hiding file extensions.</em></h5>
+<p><br />
+I have written a simple <a href="https://github.com/ExAndroidDev/rtlo-attack" target="blank">tool</a> in c# that spoofs the extension of a desired executable as well as changes the icon to anything you specify.</p>
+
+<h3 id="how-to-use-the-tool">How to use the tool?</h3>
+<p>The tool accepts two arguments, the first one is the input executable and the second is the icon. Since I don’t know how to easily explain how to use my tool I will try to explain it through examples.</p>
+
+<p>Firstly you need to rename your executable to suits the required format before passing it into the tool. 
+	Make sure that the extension you would like to spoof is the last part before the true extension. For example if you want to make a file look like “<code class="language-plaintext highlighter-rouge">.png</code>” make sure your executable name is something like “<code class="language-plaintext highlighter-rouge">simple.exemple</code><strong>.png.</strong><code class="language-plaintext highlighter-rouge">exe</code>”.
+Also, make sure that the true extension, let’s say it is “.exe” or “.scr”, is present in the filename, whether in its true form or reversed (“<code class="language-plaintext highlighter-rouge">exe.</code>” or “<code class="language-plaintext highlighter-rouge">rcs.</code>”), like “<code class="language-plaintext highlighter-rouge">simple</code><strong>.exe</strong><code class="language-plaintext highlighter-rouge">mple.png.exe</code>”. (More details on reversed extension below.)</p>
+
+<p>Once you rename your executable to match the required format pass it to the tool as a first argument along with the desired icon. <br /></p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./rtlo-attack.exe simple.exemple.png.exe png.ico
+</code></pre></div></div>
+
+<p><img src="/assets/example-1.png" alt="example-1" class="center-image" /></p>
+
+<p>The tool works by taking the file extension, like in the previous example “<code class="language-plaintext highlighter-rouge">.exe</code>” and finding the match inside the executable’s name. After the match is found, it adds rtlo and ltro characters to hide the actual extension and preserve the ordinary-looking name. If you are interested in more details take a look at the <a href="https://github.com/ExAndroidDev/rtlo-attack/blob/main/Program.cs#L47" target="blank">source code</a>.</p>
+
+<h3 id="additional-obfuscation">Additional obfuscation</h3>
+<p>As I mentioned a few paragraphs above, you can also reverse the true file extension to obfuscate it even more. 
+Let’s take a look at the next example. I am going to use the”<code class="language-plaintext highlighter-rouge">.scr</code>” extension, since reversing “<code class="language-plaintext highlighter-rouge">.exe</code>” doesn’t look much different.</p>
+<h5 id="note-to-create-an-scr-executable-just-change-the-file-extension-from-exe-to-scr-and-the-executable-will-still-run"><em>Note: To create an “.scr” executable just change the file extension from “.exe” to “.scr” and the executable will still run.</em></h5>
+<p><br />
+So let’s rename an executable to meet filename format requirements before we pass it to the tool. Rename the executable to something like “<code class="language-plaintext highlighter-rouge">My-pictu</code><strong>rcs.</strong><code class="language-plaintext highlighter-rouge">png.scr</code>” and pass it to the tool. Notice how we specified the true file extension but in reverse (“<code class="language-plaintext highlighter-rouge">rcs.</code>”) in the file name. After the tool has done its magic the resulting executable name will look like this “<code class="language-plaintext highlighter-rouge">My-picturcs.png</code>”.</p>
+
+<p><img src="/assets/example-2.png" alt="example-2" class="center-image" />
+<br /></p>
+
+<p>The other interesting way of obfuscation is changing extension casing. Since Windows OS doesn’t care about the lower or upper case, you can have an extension such as “<code class="language-plaintext highlighter-rouge">.exE</code>”.
+An example executable can look like this “<code class="language-plaintext highlighter-rouge">My</code><strong>.exE</strong><code class="language-plaintext highlighter-rouge">nvironment.png.exE</code>” and the output would end up looking like this: “<code class="language-plaintext highlighter-rouge">My.exEnvironment.png</code>”.</p>
+
+<p><img src="/assets/example-3.png" alt="example-3" class="center-image" />
+<br /></p>
+
+<h3 id="name-ideas">Name ideas:</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Original name</th>
+      <th>Spoofed name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Company.Executive.Summary.txt.Exe</td>
+      <td>Company.Executive.Summary.txt</td>
+    </tr>
+    <tr>
+      <td>SOMETHINGEXe.png.eXE</td>
+      <td>SOMETHINGEXe.png</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<h3 id="what-about-anti-virus">What about anti-virus?</h3>
+<p>You might have noticed that some AVs, like Microsoft’s Defender, for example, flag a file with rtlo character in its name. 
+Fortunately, someone has already researched that part. Thanks to the <a href="http://blog.sevagas.com/?Bypass-Defender-and-other-thoughts-on-Unicode-RTLO-attacks" target="blank">http://blog.sevagas.com/?Bypass-Defender-and-other-thoughts-on-Unicode-RTLO-attacks</a>, he concluded that AV might flag the file if it contains a rtlo character and ends with a valid extension. I will summarize it below but I encourage you to read the article.</p>
+
+<p>For example, if you spoof the file name to look like “<code class="language-plaintext highlighter-rouge">smth.executive.summary.txt</code>” it will be flagged by AV, but if the name is “<code class="language-plaintext highlighter-rouge">smth.executive.summary.blah</code>” it will not.
+If only there is a way to make an extension look legit but is not actually valid…</p>
+
+<p>Of course there is a way. Since we are already playing with different languages why wouldn’t we use letters from different alphabets.<br /> For example payload “<code class="language-plaintext highlighter-rouge">smth.executive.summary.txt</code>” is flagged by the AV, but “<code class="language-plaintext highlighter-rouge">smth.executive.summary.tхt</code>” is not since the “<code class="language-plaintext highlighter-rouge">x</code>” (<code class="language-plaintext highlighter-rouge">\u0445</code>) is not an actual Latin letter “<code class="language-plaintext highlighter-rouge">x</code>” (<code class="language-plaintext highlighter-rouge">\u0078</code>) but an Cyrillic version of letter “<code class="language-plaintext highlighter-rouge">h</code>”.  Simply copy/paste the unicode character from any unicode table website and paste it into the file name and it will do the trick.</p>
+
+<h5 id="note-there-are-a-variety-of-executable-file-extensions-but-keep-in-mind-that-not-all-of-them-can-have-a-custom-icon-for-example-you-cant-change-the-icon-of-the-bat-or-com-file-types"><em>Note: There are a variety of executable file extensions, but keep in mind that not all of them can have a custom icon. For example, you can’t change the icon of the “<code class="language-plaintext highlighter-rouge">.bat</code>” or “<code class="language-plaintext highlighter-rouge">.com</code>” file types.</em></h5>
+
+<h3 id="but-how-do-we-deliver-it">But how do we deliver it?</h3>
+<p>One option would be to make your target download ZIP archive or ISO/VHD image. ISO image is automatically mounted to the Windows OS by simply double-clicking it and since it is a different system file format it would bypass the so-called mark-of-the-web (MOTW). But that is the content for the other post.</p>
+
+<p>The end!</p>
+:ET

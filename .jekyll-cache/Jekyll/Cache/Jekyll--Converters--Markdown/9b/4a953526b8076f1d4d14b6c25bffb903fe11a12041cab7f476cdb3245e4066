@@ -1,0 +1,28 @@
+I"'<p>You have probably heard that Microsoft will soon disable macros in the documents that are coming from the internet (<a href="https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked" target="blank">https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked</a>). It got me thinking, what are the other alternatives to gain initial access to the target’s environment, what kind of payloads can we deliver?</p>
+
+<p>While browsing Mitre’s att&amp;ck I have come across a pretty old technique, known as the <a href="https://attack.mitre.org/techniques/T1036/002/" target="blank">right-to-left override attack (rtlo)</a> . If you have never heard of it, I will try to explain it briefly.
+Some languages write from left to right side, like English and German for example. Some languages write from right to left side, like Arabic and Hebrew for example.
+By default, Windows OS displays letters from left to right side but since it also supports other languages it supports writing from right to left side. There is a unicode character that flips the text to the right-to-left side (<code class="language-plaintext highlighter-rouge">\u202E</code>) and you can combine it with the already existing text.
+Basically, you can reverse text in file names and that way hide the true file extension. Read the more detailed explanation <a href="https://krebsonsecurity.com/2011/09/right-to-left-override-aids-email-attacks/" target="blank">here</a>.</p>
+
+<p>I have written a simple <a href="https://github.com/ExAndroidDev/rtlo-attack" target="blank">tool</a> in c# that spoofs the extension of a desired executable as well as changes the icon to anything you would like.</p>
+
+<p>The tool accepts two arguments, the first one is the input executable and the second is the icon. Since I don’t know how to easily explain how to use my tool I will try to explain it through examples.</p>
+
+<p>Let’s say you want to spoof your payload name to look like this: <code class="language-plaintext highlighter-rouge">My.Exemple.png</code>
+You should rename your executable as <code class="language-plaintext highlighter-rouge">My.Exemple.png.Exe</code> and pass it as a first argument. As a second argument pass the png icon or any other icon that suits your needs.</p>
+
+<p>The tool works by taking the file extension, in the previous example <code class="language-plaintext highlighter-rouge">.Exe</code> (Windows doesn’t care about casing), and finding the match inside the executable’s name. After the match is found, it adds rtlo and ltro override characters to hide the actual extension and keep the ordinary-looking name.</p>
+
+<p>You can also reverse the true file extension to obfuscate it even more. 
+Let’s take a look at the next example.
+If you would have an executable with an extension <code class="language-plaintext highlighter-rouge">.scr</code> you can reverse the extension name and make it look like <code class="language-plaintext highlighter-rouge">rcs.</code>
+So if you pass the executable name as <code class="language-plaintext highlighter-rouge">My-picturcs.png.scr</code> the resulting executable name would look like this <code class="language-plaintext highlighter-rouge">My-picturcs.png</code>.</p>
+
+<p>Some of the examples: 
+File name -&gt; spoofed filename</p>
+<ovo je="" kao="" tabela="">
+...
+...
+</ovo>
+:ET

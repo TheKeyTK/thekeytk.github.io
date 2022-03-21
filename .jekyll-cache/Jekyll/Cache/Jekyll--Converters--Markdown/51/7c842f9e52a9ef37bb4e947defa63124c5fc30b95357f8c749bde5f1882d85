@@ -1,0 +1,36 @@
+I"<<p>You have probably heard that Microsoft will soon disable macros in the documents that are coming from the internet (<a href="https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked" target="blank">https://docs.microsoft.com/en-us/deployoffice/security/internet-macros-blocked</a>). It got me thinking, what are the other alternatives to gain initial access to the target’s environment, what kind of payloads can we deliver?</p>
+
+<p>While browsing Mitre’s att&amp;ck I have come across a pretty old technique, known as the <a href="https://attack.mitre.org/techniques/T1036/002/" target="blank">right-to-left override attack (rtlo)</a> . If you have never heard of it, I will try to explain it briefly.
+Some languages write from left to right side, like English and German for example. Some languages write from right to left side, like Arabic and Hebrew for example.
+By default, Windows OS displays letters from left to right side but since it also supports other languages it supports writing from right to left side. There is a unicode character that flips the text to the right-to-left side (<code class="language-plaintext highlighter-rouge">\u202E</code>) and you can combine it with the already existing text.
+Basically, you can reverse text in file names and that way hide the true file extension.</p>
+
+<p>I have written a simple <a href="https://github.com/ExAndroidDev/rtlo-attack" target="blank">tool</a> in c# that spoofs the extension of a desired executable as well as changes the icon to anything you would like.</p>
+
+<h3 id="how-to-use-the-tool">How to use the tool?</h3>
+<p>The tool accepts two arguments, the first one is the input executable and the second is the icon. Since I don’t know how to easily explain how to use my tool I will try to explain it through examples.</p>
+
+<p>Firstly you need to rename your executable to suits the required format before passing it into the tool. 
+	Make sure that extension you would like to spoof is the last part before the true extension. For example if you want to make a file look like “<code class="language-plaintext highlighter-rouge">.png</code>” make sure your executable name is something like “<code class="language-plaintext highlighter-rouge">simple.exemple</code><strong>.png.</strong><code class="language-plaintext highlighter-rouge">exe</code>”.
+Also, make sure that the true extension, let’s say it is “.exe” or “.scr”, is present in the filename, wheter in its true form or reversed “<code class="language-plaintext highlighter-rouge">exe.</code>” or “<code class="language-plaintext highlighter-rouge">rcs.</code>”. Like “<code class="language-plaintext highlighter-rouge">simple</code><strong>.exe</strong><code class="language-plaintext highlighter-rouge">mple.png.exe</code>”.</p>
+
+<p>Once you rename your executable to match the required format pass it to the tool as a first argument along with the desired icon. <br /></p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./rtlo-attack.exe simple.exemple.png.exe png.ico
+</code></pre></div></div>
+
+<p><img src="/assets/example-1.png" alt="example-1" class="center-image" /></p>
+
+<p>The tool works by taking the file extension, like in the previous example <code class="language-plaintext highlighter-rouge">.exe</code> and finding the match inside the executable’s name. After the match is found, it adds rtlo and ltro override characters to hide the actual extension and keep the ordinary-looking name. If you are interested in more details take a look at the <a href="https://github.com/ExAndroidDev/rtlo-attack/blob/main/Program.cs#L47">source code</a>.</p>
+
+<p>You can also reverse the true file extension to obfuscate it even more. 
+Let’s take a look at the next example.
+If you would have an executable with an extension <code class="language-plaintext highlighter-rouge">.scr</code> you can reverse the extension name and make it look like <code class="language-plaintext highlighter-rouge">rcs.</code>
+So if you pass the executable name as <code class="language-plaintext highlighter-rouge">My-picturcs.png.scr</code> the resulting executable name would look like this <code class="language-plaintext highlighter-rouge">My-picturcs.png</code>.</p>
+
+<p>Some of the examples: 
+File name -&gt; spoofed filename</p>
+<ovo je="" kao="" tabela="">
+...
+...
+</ovo>
+:ET

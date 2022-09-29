@@ -1,8 +1,8 @@
 # Setup
-title: Ex Android Dev
-description: cyber security blog posts
-url: https://www.exandroid.dev
-id: https://www.exandroid.dev
+title: TheKey.tk
+description: Where morbid curiosity is key
+url: https://www.thekey.tk
+id: https://www.thekey.tk
 baseurl: ""
 permalink: pretty
 
@@ -31,13 +31,13 @@ sass:
 # Options
 
 # Replace this value and uncomment to enable Google Analytics tracking
-ga_analytics: UA-193334062-1
+# ga_analytics: UA-193334062-1
 
 # Specify the author for blog posts
 author:
-  name: ExAndroidDev
-  url: https://www.exandroid.dev
-  twitter: ExAndroidDev
+  name: TheKey
+  url: https://www.thekey.tk
+  twitter: IHaveNoTwitter
 
 # Custom vars
 version: 3.0.0

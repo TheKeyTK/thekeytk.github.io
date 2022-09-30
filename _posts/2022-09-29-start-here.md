@@ -3,7 +3,6 @@ title: Start here
 layout: post
 ---
 
-# Hello
 Hi.
 
 This blog is inspired by, but not affiliated to, VX-underground and Gi7w0rm. 

@@ -1,8 +1,8 @@
 # Setup
-title: thekeytk.github.io
+title: the-key.tk
 description: Where morbid curiosity is key
-url: https://www.thekeytk.github.io
-id: https://www.thekeytk.github.io
+url: https://www.the-key.tk
+id: https://www.the-key.tk
 baseurl: ""
 permalink: pretty
 
@@ -36,7 +36,7 @@ sass:
 # Specify the author for blog posts
 author:
   name: TheKey
-  url: https://www.thekeytk.github.io
+  url: https://www.the-key.tk
   twitter: IHaveNoTwitter
 
 # Custom vars
